@@ -3,7 +3,7 @@ services:
     name: flicksync
     env: python
     plan: free
-    buildCommand: "cd Flicksync-main && pip install -r requirement.txt && cd flicksync && python manage.py migrate && python manage.py collectstatic --noinput"
+    buildCommand: "pip install -r Flicksync-main/requirement.txt && python notebooks/generate_recommendations.py && cd Flicksync-main/flicksync && python manage.py migrate && python manage.py collectstatic --noinput"
     startCommand: "cd Flicksync-main/flicksync && gunicorn cinesense.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
