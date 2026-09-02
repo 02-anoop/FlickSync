@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: flicksync
+    env: python
+    buildCommand: "cd Flicksync-main && pip install -r requirement.txt && cd flicksync && python manage.py migrate && python manage.py collectstatic --noinput"
+    startCommand: "cd Flicksync-main/flicksync && gunicorn cinesense.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.6
+      - key: DJANGO_DEBUG
+        value: False
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: TMDB_API_KEY
+        sync: false
