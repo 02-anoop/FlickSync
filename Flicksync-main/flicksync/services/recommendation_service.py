@@ -2,13 +2,14 @@ import os
 import pickle
 import pandas as pd
 from django.conf import settings
+from sklearn.metrics.pairwise import cosine_similarity
 
 class RecommendationService:
     _instance = None
 
     def __init__(self):
         self.movies = None
-        self.similarity = None
+        self.vectors = None
         self._load_models()
 
     @classmethod
@@ -26,24 +27,24 @@ class RecommendationService:
         ]
         
         movies_dict_path = None
-        similarity_path = None
+        vectors_path = None
 
         for d in possible_dirs:
             p1 = os.path.join(d, 'movies_dict.pkl')
-            p2 = os.path.join(d, 'similarity.pkl')
+            p2 = os.path.join(d, 'vectors.pkl')
             if os.path.exists(p1) and movies_dict_path is None:
                 movies_dict_path = p1
-            if os.path.exists(p2) and similarity_path is None:
-                similarity_path = p2
+            if os.path.exists(p2) and vectors_path is None:
+                vectors_path = p2
 
-        if movies_dict_path and similarity_path:
+        if movies_dict_path and vectors_path:
             try:
                 with open(movies_dict_path, 'rb') as f:
                     movies_dict = pickle.load(f)
                 self.movies = pd.DataFrame(movies_dict)
-                with open(similarity_path, 'rb') as f:
-                    self.similarity = pickle.load(f)
-                print(f"[RecommendationService] Successfully loaded {len(self.movies)} movies and similarity matrix ({self.similarity.shape}).")
+                with open(vectors_path, 'rb') as f:
+                    self.vectors = pickle.load(f)
+                print(f"[RecommendationService] Successfully loaded {len(self.movies)} movies and sparse vectors ({self.vectors.shape}).")
             except Exception as e:
                 print(f"[RecommendationService] Error loading pickles: {e}")
         else:
@@ -55,7 +56,7 @@ class RecommendationService:
         return []
 
     def get_recommendations(self, movie_title, top_n=5):
-        if self.movies is None or self.similarity is None:
+        if self.movies is None or self.vectors is None:
             return []
         
         title_lower = movie_title.strip().lower()
@@ -72,7 +73,9 @@ class RecommendationService:
         movie_idx = matches.index[0]
         selected_movie = self.movies.iloc[movie_idx]
 
-        distances = self.similarity[movie_idx]
+        # Calculate cosine similarity dynamically for just this ONE movie to save memory
+        distances = cosine_similarity(self.vectors[movie_idx], self.vectors).flatten()
+
         # Sort by similarity score descending, skip the first (the movie itself)
         ranked = sorted(list(enumerate(distances)), reverse=True, key=lambda x: x[1])
         recommendations = []

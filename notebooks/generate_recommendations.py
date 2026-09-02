@@ -72,15 +72,12 @@ new_df.head(2)
 new_df['tags'] = new_df['tags'].apply(lambda x:" ".join(x))
 new_df.head(2)
 new_df['tags']= new_df['tags'].apply(lambda x : x.lower())
-#Here we are performing vectorization , here we do not use stop words
-#we uses sklearn  
+# Here we are performing vectorization, here we do not use stop words
 from sklearn.feature_extraction.text import CountVectorizer
-cv = CountVectorizer(max_features=5000 , stop_words='english')
-cv.fit_transform(new_df['tags']).toarray().shape
-vectors =cv.fit_transform(new_df['tags']).toarray()
-vectors[0]
-cv.get_feature_names_out()
-#now we apply steming
+cv = CountVectorizer(max_features=5000, stop_words='english')
+vectors = cv.fit_transform(new_df['tags']) # Keep it sparse!
+
+# now we apply steming
 import nltk 
 from nltk.stem.porter import PorterStemmer
 ps = PorterStemmer()
@@ -89,29 +86,17 @@ def stem(text):
     for i in text.split():
         y.append(ps.stem(i))
     return " ".join(y)
-new_df['tags'] =new_df['tags'].apply(stem)
-from sklearn.metrics.pairwise import cosine_similarity
-cosine_similarity(vectors).shape
-similarity = cosine_similarity(vectors)
-similarity[1]
-#enumerate used for indexing
-sorted(list(enumerate(similarity[0])),reverse=True , key=lambda x:x[1])[1:6]
-def recommend(movie):
-    movie_index = new_df[new_df['title']==movie].index[0]
-    distances = similarity[movie_index]
-    movies_list = sorted(list(enumerate(distances)),reverse=True , key=lambda x:x[1])[1:6]
+new_df['tags'] = new_df['tags'].apply(stem)
 
-    for i in movies_list :
-        print(new_df.iloc[i[0]].title)
-    
-new_df['title']
-recommend('Avatar')
+# We do NOT precompute cosine similarity anymore to save memory
 import pickle
 
 # 1. Export the dataframe as a dictionary
-pickle.dump(new_df.to_dict(), open('movies_dict.pkl', 'wb'))
+with open('movies_dict.pkl', 'wb') as f:
+    pickle.dump(new_df.to_dict(), f)
 
-# 2. Export the similarity matrix
-pickle.dump(similarity, open('similarity.pkl', 'wb'))
+# 2. Export the sparse vectors matrix
+with open('vectors.pkl', 'wb') as f:
+    pickle.dump(vectors, f)
 
-print("Files generated successfully!")
+print("Files generated successfully! (Optimized Sparse Matrix)")
