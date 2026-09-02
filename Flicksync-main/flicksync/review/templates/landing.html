@@ -1,0 +1,155 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}FlickSync | Movie Reviews & Recommendations{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- Hero Section -->
+    <section class="text-center py-5 mb-5 bg-white border rounded">
+        <h1 class="display-4 fw-bold">Movie Discovery & Reviews</h1>
+        <p class="lead text-muted mx-auto mb-4" style="max-width: 600px;">
+            Explore over 4,800 films, find similar recommendations, and evaluate community reviews in real time.
+        </p>
+
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'recommender' %}" class="btn btn-primary btn-lg">
+                Find Recommendations
+            </a>
+            <a href="{% url 'sentiment_tool' %}" class="btn btn-outline-primary btn-lg">
+                Analyze Sentiment
+            </a>
+            <a href="{% url 'review_list' %}" class="btn btn-outline-secondary btn-lg">
+                Community Reviews
+            </a>
+        </div>
+    </section>
+
+    <!-- Metrics -->
+    <section class="mb-5">
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="card p-3 bg-light border-0">
+                    <div class="fs-2 fw-bold text-dark mb-1">4,806</div>
+                    <div class="text-muted small">Curated Movies</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 bg-light border-0">
+                    <div class="fs-2 fw-bold text-dark mb-1">5,000</div>
+                    <div class="text-muted small">Features</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 bg-light border-0">
+                    <div class="fs-2 fw-bold text-dark mb-1">87%</div>
+                    <div class="text-muted small">Sentiment Accuracy</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 bg-light border-0">
+                    <div class="fs-2 fw-bold text-dark mb-1">Fast</div>
+                    <div class="text-muted small">Search Results</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spotlight Films Showcase -->
+    <section class="my-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fw-bold mb-0">Spotlight Titles</h3>
+            <a href="{% url 'recommender' %}" class="btn btn-sm btn-outline-secondary">
+                Search All Movies
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for movie in spotlight_movies %}
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card h-100 border-0 shadow-sm">
+                    <img src="{{ movie.poster_url }}" class="card-img-top" alt="{{ movie.title }}" loading="lazy"
+                         onerror="this.onerror=null; this.src='/review/poster-proxy/?title={{ movie.title|urlencode }}&movie_id={{ movie.movie_id }}&v=2'">
+                    <div class="card-body p-2 d-flex flex-column">
+                        <h6 class="card-title fw-bold text-truncate mb-2" title="{{ movie.title }}">{{ movie.title }}</h6>
+                        <a href="{% url 'recommender' %}?query={{ movie.title|urlencode }}" class="btn btn-sm btn-outline-primary mt-auto">
+                            Recommend
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- How it Works -->
+    <section class="my-5 bg-white border rounded p-4">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">How FlickSync Works</h2>
+            <p class="text-muted">An overview of our recommendation and analysis pipeline.</p>
+        </div>
+
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="p-3">
+                    <h5 class="fw-bold">1. Feature Extraction</h5>
+                    <p class="text-muted small">
+                        Extracts keywords, cast, and genres from movies to find semantic similarities between them.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 border-start border-end">
+                    <h5 class="fw-bold">2. Sentiment Analysis</h5>
+                    <p class="text-muted small">
+                        Uses a machine learning model trained on movie reviews to classify sentiments as positive or negative.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3">
+                    <h5 class="fw-bold">3. Movie Posters</h5>
+                    <p class="text-muted small">
+                        Fetches high-quality posters directly from TMDB, falling back to clean placeholders when needed.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recent Community Critiques Section -->
+    {% if recent_reviews %}
+    <section class="my-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fw-bold mb-0">Recent Reviews</h3>
+            <a href="{% url 'review_list' %}" class="btn btn-sm btn-outline-secondary">
+                View All
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for rev in recent_reviews %}
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-primary text-truncate" style="max-width: 60%;" title="{{ rev.movie_name }}">
+                                {{ rev.movie_name }}
+                            </span>
+                            <small class="text-muted">@{{ rev.user.username }}</small>
+                        </div>
+                        <p class="card-text small mb-3">"{{ rev.text }}"</p>
+                        <a href="{% url 'review_analyse' rev.id %}" class="btn btn-sm btn-outline-primary mt-auto">
+                            Analyze Sentiment
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+{% endblock %}

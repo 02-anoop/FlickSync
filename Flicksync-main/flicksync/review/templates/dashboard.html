@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% load static %}
+{% block title %}
+FlickSync | Dashboard
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'style.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<div class="hero" style="margin-top: 50px; border-radius: 10px;">
+    <h1 style="color: white; text-align: center; text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);">Discover Your Next Favorite Movie</h1>
+    <p style="color: white; text-align: center;">Enter a movie you love, and we'll recommend 5 similar masterpieces tailored just for you.</p>
+
+    <div class="search-box">
+        <div class="input-container">
+            <i class="fas fa-search search-icon"></i>
+            <input list="movies" id="movie-input" placeholder="Type a movie name..." autocomplete="off">
+            <datalist id="movies">
+                {% for title in movie_list %}
+                    <option value="{{ title }}"></option>
+                {% endfor %}
+            </datalist>
+        </div>
+        <button id="search-btn" onclick="fetchRecommendations()">
+            <i class="fas fa-magic"></i> Recommend
+        </button>
+    </div>
+</div>
+
+<div class="container" style="color: white;">
+    <div id="loading" class="hidden text-center">
+        <div class="spinner" style="margin: 0 auto;"></div>
+        <p>Finding the best matches...</p>
+    </div>
+
+    <div class="results-grid" id="recommendations"></div>
+</div>
+
+<div style="text-align: center; margin-top: 50px; margin-bottom: 50px; background: rgba(0,0,0,0.7); padding: 40px; border-radius: 10px;">
+    <h2 style="color: #FFED28; text-shadow: 0 0 10px rgba(255, 237, 40, 0.5);">Movie Reviews & Sentiment Analyzer</h2>
+    <p style="color: white; margin-bottom: 20px;">Write reviews and see if they are positive or negative using our AI Sentiment Analyzer!</p>
+    <a href="{% url 'review_list' %}" class="btn btn-outline-success" style="padding: 10px 30px; font-size: 1.2rem;">Go to Reviews</a>
+</div>
+
+<script src="{% static 'scripts.js' %}"></script>
+{% endblock %}

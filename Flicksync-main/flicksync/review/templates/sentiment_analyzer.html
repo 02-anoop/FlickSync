@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}FlickSync | Sentiment Analyzer{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="text-center py-4 mb-4 border-bottom">
+        <h2 class="fw-bold">Sentiment Analyzer</h2>
+        <p class="text-muted">
+            Enter a movie review below to evaluate if it has a positive or negative sentiment.
+        </p>
+    </div>
+
+    <!-- Input Card -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="standard-card">
+                <form method="POST" action="{% url 'sentiment_tool' %}" id="sentiment-form">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="review_text" class="form-label fw-bold">
+                            Review Text
+                        </label>
+                        <textarea class="form-control" id="review_text" name="review_text" rows="4" 
+                                  placeholder="E.g., 'An absolute cinematic masterpiece with breathtaking visual effects!'" 
+                                  required>{{ review_text }}</textarea>
+                    </div>
+
+                    <!-- Quick Sample Buttons -->
+                    <div class="d-flex gap-2 flex-wrap mb-4 align-items-center">
+                        <span class="text-muted small">Try a sample:</span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="fillSample('The cinematography, acting, and musical score were phenomenal. One of the best films of the decade!')">
+                            Positive
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="fillSample('Terrible screenplay, dull pacing, and completely unconvincing performances. A massive disappointment.')">
+                            Negative
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="fillSample('Visually stunning and ambitious in scope, though the third act felt slightly rushed.')">
+                            Nuanced
+                        </button>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            Analyze Sentiment
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Sentiment Prediction Result -->
+                {% if result %}
+                <div class="mt-4 pt-4 border-top">
+                    <div class="p-4 rounded border text-center {% if result.sentiment == 'positive' %}bg-light border-success{% else %}bg-light border-danger{% endif %}">
+                        
+                        <div class="mb-3">
+                            {% if result.sentiment == 'positive' %}
+                                <h4 class="fw-bold text-success mb-1">POSITIVE SENTIMENT</h4>
+                            {% else %}
+                                <h4 class="fw-bold text-danger mb-1">NEGATIVE SENTIMENT</h4>
+                            {% endif %}
+                        </div>
+
+                        <!-- Confidence Meter -->
+                        <div class="my-3 p-3 bg-white rounded border">
+                            <div class="d-flex justify-content-between text-secondary small mb-1 fw-bold">
+                                <span>Confidence</span>
+                                <span>{{ result.confidence_percentage }}%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar {% if result.sentiment == 'positive' %}bg-success{% else %}bg-danger{% endif %}" role="progressbar" 
+                                     style="width: {{ result.confidence_percentage }}%;" 
+                                     aria-valuenow="{{ result.confidence_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+
+                        <!-- Evaluated Text -->
+                        <div class="p-3 bg-white rounded border text-start mt-3">
+                            <span class="badge bg-light text-dark border mb-1">Input Text:</span>
+                            <p class="text-dark mb-0 small fst-italic">"{{ result.text }}"</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function fillSample(text) {
+    document.getElementById('review_text').value = text;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}FlickSync | Movie Recommender{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Recommender Header -->
+    <section class="pb-2 pt-4 border-bottom mb-4">
+        <h2 class="fw-bold mb-3">Movie Recommender</h2>
+        <p class="text-muted">
+            Enter a movie you love, and we will find the top 5 closest matches based on cast, crew, keywords, and genres.
+        </p>
+
+        <!-- Search Box Container -->
+        <div class="search-container text-start mb-4">
+            <form method="GET" action="{% url 'recommender' %}" id="search-form" onsubmit="handleFormSubmit(event)">
+                <div class="search-bar-wrapper">
+                    <input list="movie-datalist" id="movie-input" name="query" class="search-input" 
+                           placeholder="Type a movie title..." 
+                           value="{{ query }}" autocomplete="off" required>
+                    <datalist id="movie-datalist">
+                        {% for title in movie_list %}
+                            <option value="{{ title }}"></option>
+                        {% endfor %}
+                    </datalist>
+                    <button type="submit" class="search-btn" id="recommend-btn">
+                        Recommend
+                    </button>
+                </div>
+            </form>
+
+            <!-- Quick Suggestion Chips -->
+            <div class="d-flex align-items-center gap-2 flex-wrap mt-3">
+                <span class="text-muted small me-1">Examples:</span>
+                <button class="chip-btn-light" onclick="quickSearch('The Dark Knight')">The Dark Knight</button>
+                <button class="chip-btn-light" onclick="quickSearch('Avatar')">Avatar</button>
+                <button class="chip-btn-light" onclick="quickSearch('Interstellar')">Interstellar</button>
+                <button class="chip-btn-light" onclick="quickSearch('Inception')">Inception</button>
+                <button class="chip-btn-light" onclick="quickSearch('The Avengers')">The Avengers</button>
+                <button class="chip-btn-light" onclick="quickSearch('Pulp Fiction')">Pulp Fiction</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading Spinner Indicator -->
+    <div id="loading-spinner" class="text-center my-5 d-none">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="text-secondary mt-3">Loading recommendations...</p>
+    </div>
+
+    <!-- Recommendations Result Section -->
+    <div id="results-container">
+        {% if recommendations %}
+        <div class="mt-4 mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div>
+                    <h4 class="fw-bold text-dark mb-1">
+                        Top Matches for "{{ selected_movie }}"
+                    </h4>
+                    <p class="text-muted small mb-0">5 recommendations found.</p>
+                </div>
+                <a href="{% url 'review_create' %}?movie_name={{ selected_movie|urlencode }}" class="btn btn-outline-primary btn-sm">
+                    Write a Review
+                </a>
+            </div>
+
+            <div class="movie-grid">
+                {% for movie in recommendations %}
+                <div class="movie-card shadow-sm">
+                    <div class="poster-wrapper">
+                        <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="poster-img" loading="lazy"
+                             onerror="this.onerror=null; this.src='/review/poster-proxy/?title={{ movie.title|urlencode }}&movie_id={{ movie.movie_id }}&v=2'">
+                        <div class="match-badge">
+                            {{ movie.match_percentage }}% Match
+                        </div>
+                    </div>
+                    <div class="movie-card-body">
+                        <div>
+                            <h6 class="movie-card-title text-truncate" title="{{ movie.title }}">{{ movie.title }}</h6>
+                            <span class="badge bg-light text-dark border small mb-2">ID: {{ movie.movie_id }}</span>
+                        </div>
+                        <div class="d-flex flex-column gap-2 mt-2">
+                            <a href="{% url 'review_create' %}?movie_name={{ movie.title|urlencode }}" class="btn btn-primary btn-sm w-100">
+                                Review
+                            </a>
+                            <a href="{% url 'recommender' %}?query={{ movie.title|urlencode }}" class="btn btn-outline-secondary btn-sm w-100">
+                                Find Similar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% elif query %}
+        <div class="text-center my-5 p-5 bg-white border rounded">
+            <h4 class="text-dark fw-bold">No exact match found for "{{ query }}"</h4>
+            <p class="text-muted">Try selecting one of the suggested titles from the autocomplete dropdown list.</p>
+        </div>
+        {% elif starter_movies %}
+        <!-- Quick Starter Exploration Grid -->
+        <div class="mt-4 mb-5">
+            <div class="mb-3">
+                <h5 class="fw-bold mb-1">Quick Starter Titles</h5>
+                <p class="text-muted small mb-0">Select any film below to find similar movies.</p>
+            </div>
+
+            <div class="row g-4">
+                {% for movie in starter_movies %}
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="poster-wrapper" style="aspect-ratio: 2/3;">
+                            <img src="{{ movie.poster_url }}" alt="{{ movie.title }}" class="w-100 h-100 object-fit-cover" loading="lazy"
+                                 onerror="this.onerror=null; this.src='/review/poster-proxy/?title={{ movie.title|urlencode }}&movie_id={{ movie.movie_id }}&v=2'">
+                        </div>
+                        <div class="card-body p-2 d-flex flex-column justify-content-between">
+                            <h6 class="card-title fw-bold text-dark text-truncate mb-2 small" title="{{ movie.title }}">{{ movie.title }}</h6>
+                            <a href="{% url 'recommender' %}?query={{ movie.title|urlencode }}" class="btn btn-sm btn-outline-primary w-100">
+                                Recommend
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function quickSearch(title) {
+    document.getElementById('movie-input').value = title;
+    document.getElementById('loading-spinner').classList.remove('d-none');
+    document.getElementById('results-container').classList.add('opacity-50');
+    document.getElementById('search-form').submit();
+}
+
+function handleFormSubmit(e) {
+    document.getElementById('loading-spinner').classList.remove('d-none');
+    document.getElementById('results-container').classList.add('opacity-50');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,207 @@
+/* FlickSync - Simple Standard Theme */
+:root {
+  --primary-color: #0d6efd;
+  --primary-hover: #0b5ed7;
+  --bg-main: #f8f9fa;
+  --text-dark: #212529;
+  --text-muted: #6c757d;
+  --border-light: #dee2e6;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-dark);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar-flicksync {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.75rem 1rem;
+}
+
+.brand-logo {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--primary-color) !important;
+  text-decoration: none;
+  letter-spacing: -0.5px;
+}
+
+.nav-link-custom {
+  color: var(--text-dark) !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem !important;
+  border-radius: 4px;
+}
+
+.nav-link-custom:hover, .nav-link-custom.active {
+  background: #e9ecef;
+}
+
+/* Base Buttons */
+.btn-primary-custom {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 500;
+}
+.btn-primary-custom:hover {
+  background-color: var(--primary-hover);
+  color: #fff;
+}
+
+.btn-outline-custom {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 500;
+}
+.btn-outline-custom:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+/* Search Box Container */
+.search-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-bar-wrapper {
+  display: flex;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  padding: 0.75rem 1rem;
+  outline: none;
+}
+
+.search-btn {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 0 1.5rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.search-btn:hover {
+  background: var(--primary-hover);
+}
+
+.chip-btn-light {
+  background: #fff;
+  border: 1px solid var(--border-light);
+  color: var(--text-dark);
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.chip-btn-light:hover {
+  background: #e9ecef;
+}
+
+/* Movie Recommendation Card Grid */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.movie-card {
+  background: #fff;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.poster-wrapper {
+  width: 100%;
+  aspect-ratio: 2/3;
+  background: #e9ecef;
+  position: relative;
+}
+
+.poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.match-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #198754;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.movie-card-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-between;
+}
+
+.movie-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Forms & Cards */
+.standard-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 1.5rem;
+}
+
+/* Footer */
+footer.site-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--border-light);
+  background: #ffffff;
+}
+
+.footer-nav-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.footer-nav-links a:hover {
+  text-decoration: underline;
+}
+
+.review-critique-card {
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  background: #fff;
+  margin-bottom: 1rem;
+}
